@@ -47,7 +47,7 @@ class CarModel:
     def __str__(self) -> str:
         return self.name 
     def __repr__(self) -> str:
-        return self.name +":"+ str(self.listOfGenerations)
+        return self.name +", "+ str(self.listOfGenerations)
 
 class CarBrand:
     def __init__(self, name, url) -> None:
@@ -59,10 +59,8 @@ class CarBrand:
     def __str__(self) -> str:
         return self.name
     def __repr__(self) -> str:
-        return self.name +": " + str(self.listOfModels)
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, 
-            sort_keys=True, indent=4)
+        return self.name +", " + str(self.listOfModels)
+
         
 startTime = time.time()
 page_url="https://www.autocentrum.pl/dane-techniczne"
@@ -115,7 +113,6 @@ for car in ListOfCarBrands:
             outputNames = output.find_all("h2", {"class": 'name-of-the-car'})
         except AttributeError:
             continue
-
 
         for i in range(len(outputNames)):
             url = main_page_url + outputUrls[i].attrs['href']
