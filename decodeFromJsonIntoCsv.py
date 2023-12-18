@@ -2,7 +2,7 @@ import jsonpickle
 
 
 
-class CarModelGenerationLift:
+class CarModelGenerationVersion:
     def __init__(self, name, url) -> None:
         self.name= self.deleteWhiteSpace(name)
         self.url = url
@@ -18,15 +18,17 @@ class CarModelGenerationLift:
         return ''.join(outputList)
 
 
-
 class CarModelGeneration:
     def __init__(self, name, url) -> None:
         self.name= self.deleteWhiteSpace(name)
+        self.listOfVersions=[]
         self.url = url
     def __str__(self) -> str:
         return self.name
     def __repr__(self) -> str:
         return self.name
+    def addVersion(self, CarModelGenerationVersion: CarModelGenerationVersion):
+        self.listOfVersions.append(CarModelGenerationVersion)
     def deleteWhiteSpace(self, name:str):
         outputList =[]
         for chr in name:
@@ -57,6 +59,7 @@ class CarBrand:
         return self.name
     def __repr__(self) -> str:
         return self.name +", " + str(self.listOfModels)
+
 
 
 def openAndDecodeJson(path:str)->list:
