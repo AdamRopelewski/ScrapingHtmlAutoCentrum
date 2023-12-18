@@ -44,7 +44,7 @@ class CarModel:
     def __str__(self) -> str:
         return self.name 
     def __repr__(self) -> str:
-        return self.name +":"+ str(self.listOfGenerations)
+        return self.name +", "+ str(self.listOfGenerations)
 
 class CarBrand:
     def __init__(self, name, url) -> None:
@@ -56,18 +56,8 @@ class CarBrand:
     def __str__(self) -> str:
         return self.name
     def __repr__(self) -> str:
-        return self.name +": " + str(self.listOfModels)
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, 
-            sort_keys=True, indent=4)
-        
+        return self.name +", " + str(self.listOfModels)
 
-ListOfCarBrands=[]
-print(ListOfCarBrands)
-
-
-
-json_string = jsonpickle.encode(ListOfCarBrands)
 
 try:
     f = open("ListOfCarBrands.json", "r")
@@ -75,4 +65,21 @@ try:
 finally:
     f.close()
 
-print("")
+# print(ListOfCarBrands)
+# print("")
+
+output=[]
+for brand in ListOfCarBrands:
+    for model in brand.listOfModels:
+        for generation in model.listOfGenerations:
+            output.append(f"{brand.name}; {model.name}; {generation.name}; \n")
+
+try:
+    f = open("ListOfCarBrands.csv", "w")
+    f.write(''.join(output))
+finally:
+    f.close()
+
+
+    
+print(''.join(output))
