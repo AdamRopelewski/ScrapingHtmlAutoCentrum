@@ -88,7 +88,7 @@ for i in range(len(output)):
 print("All of the Car Brands names have been loaded.\n")
 
 #Loading Models of the Brands into the list
-for car in ListOfCarBrands[0:1]:
+for car in ListOfCarBrands[0:10]:
     page = requests.get(car.url)
     soup = BeautifulSoup(page.content, 'html.parser')
     try:
@@ -102,7 +102,7 @@ for car in ListOfCarBrands[0:1]:
     for i in range(len(outputNames)):
         url = main_page_url + outputUrls[i].attrs['href']
         car.addCarModel(CarModel(outputNames[i].contents[0].strip(), url))
-    print(f"Finish adding model for: {car.name}\n")
+    print(f"Finished adding model for: {car.name}\n")
 
 #Loading Generaton of the Models into the list
 for car in ListOfCarBrands:
@@ -120,7 +120,7 @@ for car in ListOfCarBrands:
         for i in range(len(outputNames)):
             url = main_page_url + outputUrls[i].attrs['href']
             model.addGeneration(CarModelGeneration(outputNames[i].contents[0].strip(), url))
-        print(f"Finish adding generations for: {model.name}\n")
+        print(f"Finished adding generations for: {car.name}: {model.name}\n")
 
 elapsed = time.time() - startTime
 print(ListOfCarBrands)
