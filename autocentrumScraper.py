@@ -1,5 +1,26 @@
 import requests
 from bs4 import BeautifulSoup
+import time
+import jsonpickle
+
+
+
+class CarModelGenerationLift:
+    def __init__(self, name, url) -> None:
+        self.name= self.deleteWhiteSpace(name)
+        self.url = url
+    def __str__(self) -> str:
+        return self.name
+    def __repr__(self) -> str:
+        return self.name
+    def deleteWhiteSpace(self, name:str):
+        outputList =[]
+        for chr in name:
+            if ord(chr)!= 32 and ord(chr)!=10:
+                outputList.append(chr)
+        return ''.join(outputList)
+
+
 
 class CarModelGeneration:
     def __init__(self, name, url) -> None:
@@ -8,7 +29,7 @@ class CarModelGeneration:
     def __str__(self) -> str:
         return self.name
     def __repr__(self) -> str:
-        return "\n" + self.name
+        return self.name
     def deleteWhiteSpace(self, name:str):
         outputList =[]
         for chr in name:
@@ -24,7 +45,6 @@ class CarModel:
     def addGeneration(self, CarModelGeneration: CarModelGeneration):
         self.listOfGenerations.append(CarModelGeneration)
     def __str__(self) -> str:
-        # return self.name +": \n"+ str(self.listOfGenerations)
         return self.name 
     def __repr__(self) -> str:
         return self.name +":"+ str(self.listOfGenerations)
@@ -40,8 +60,11 @@ class CarBrand:
         return self.name
     def __repr__(self) -> str:
         return self.name +": " + str(self.listOfModels)
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, 
+            sort_keys=True, indent=4)
         
-
+startTime = time.time()
 page_url="https://www.autocentrum.pl/dane-techniczne"
 main_page_url = "https://www.autocentrum.pl"
 
@@ -55,6 +78,7 @@ soup = BeautifulSoup(page.content, 'html.parser')
 output = soup.find_all("div", {"class": 'make-wrapper popular-make'})
 output += soup.find_all("div", {"class": 'make-wrapper not-popular-make'})
 
+#Loading CarBrands into the list
 for i in range(len(output)):
     name = str(output[i].contents[1].contents[3])
     name = name[19:]
@@ -63,22 +87,29 @@ for i in range(len(output)):
 
     ListOfCarBrands.append(CarBrand(name, url))
 
+#Loading Models of the Brands into the list
 for car in ListOfCarBrands[0:1]:
     page = requests.get(car.url)
     soup = BeautifulSoup(page.content, 'html.parser')
-    output = soup.find("div", {"class": 'car-selector-box-row'})
-    outputUrls = output.find_all("a", href=True)
-    outputNames = output.find_all("h2", {"class": 'name-of-the-car'})
+    try:
+        output = soup.find("div", {"class": 'car-selector-box-row'})
+        outputUrls = output.find_all("a", href=True)
+        outputNames = output.find_all("h2", {"class": 'name-of-the-car'})
+    except AttributeError:
+    #If the page doesnt load - skip it
+        continue
 
     for i in range(len(outputNames)):
         url = main_page_url + outputUrls[i].attrs['href']
         car.addCarModel(CarModel(outputNames[i].contents[0].strip(), url))
 
-for car in ListOfCarBrands[0:1]:
+#Loading Generaton of the Models into the list
+for car in ListOfCarBrands:
     for model in car.listOfModels:
         page = requests.get(model.url)
         soup = BeautifulSoup(page.content, 'html.parser')
         try:
+        #If Model has no generation - skip looking for them
             output = soup.find("div", {"class": 'car-selector-box-row active'})
             outputUrls = output.find_all("a", href=True)
             outputNames = output.find_all("h2", {"class": 'name-of-the-car'})
@@ -90,6 +121,18 @@ for car in ListOfCarBrands[0:1]:
             url = main_page_url + outputUrls[i].attrs['href']
             model.addGeneration(CarModelGeneration(outputNames[i].contents[0].strip(), url))
 
+elapsed = time.time() - startTime
+print(ListOfCarBrands)
 
-print(ListOfCarBrands[0:1])
+
+
+print(f"\nCzas trwania: {elapsed}")
+json_string = jsonpickle.encode(ListOfCarBrands)
+
+try:
+    f = open("ListOfCarBrands.json", "w")
+    f.write(json_string)
+finally:
+    f.close()
 print("")
+
