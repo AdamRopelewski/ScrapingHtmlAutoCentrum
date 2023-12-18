@@ -75,7 +75,8 @@ def convertListOfCarBrandsToCSV(ListOfCarBrands:list, path:str)->None:
     for brand in ListOfCarBrands:
         for model in brand.listOfModels:
             for generation in model.listOfGenerations:
-                output.append(f"{brand.name}; {model.name}; {generation.name}; \n")
+                for version in generation.listOfVersions:
+                    output.append(f"{brand.name}; {model.name}; {generation.name}; {version.name}\n")
 
     try:
         f = open(path, "w")
