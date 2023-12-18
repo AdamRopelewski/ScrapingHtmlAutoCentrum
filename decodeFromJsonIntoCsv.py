@@ -59,27 +59,23 @@ class CarBrand:
         return self.name +", " + str(self.listOfModels)
 
 
-try:
-    f = open("ListOfCarBrands.json", "r")
-    ListOfCarBrands = jsonpickle.decode(f.read())
-finally:
-    f.close()
+def openAndDecodeJson(path:str)->list:
+    try:
+        f = open(path, "r")
+        ListOfCarBrands = jsonpickle.decode(f.read())
+    finally:
+        f.close()
+    return ListOfCarBrands
 
-# print(ListOfCarBrands)
-# print("")
+def convertListOfCarBrandsToCSV(ListOfCarBrands:list, path:str)->None:
+    output=[]
+    for brand in ListOfCarBrands:
+        for model in brand.listOfModels:
+            for generation in model.listOfGenerations:
+                output.append(f"{brand.name}; {model.name}; {generation.name}; \n")
 
-output=[]
-for brand in ListOfCarBrands:
-    for model in brand.listOfModels:
-        for generation in model.listOfGenerations:
-            output.append(f"{brand.name}; {model.name}; {generation.name}; \n")
-
-try:
-    f = open("ListOfCarBrands.csv", "w")
-    f.write(''.join(output))
-finally:
-    f.close()
-
-
-    
-print(''.join(output))
+    try:
+        f = open(path, "w")
+        f.write(''.join(output))
+    finally:
+        f.close()
