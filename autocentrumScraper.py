@@ -2,10 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import jsonpickle
+from decodeFromJsonIntoCsv import openAndDecodeJson, convertListOfCarBrandsToCSV
 
-
-
-class CarModelGenerationLift:
+class CarModelGenerationVersion:
     def __init__(self, name, url) -> None:
         self.name= self.deleteWhiteSpace(name)
         self.url = url
@@ -21,15 +20,17 @@ class CarModelGenerationLift:
         return ''.join(outputList)
 
 
-
 class CarModelGeneration:
     def __init__(self, name, url) -> None:
         self.name= self.deleteWhiteSpace(name)
+        self.listOfVersions=[]
         self.url = url
     def __str__(self) -> str:
         return self.name
     def __repr__(self) -> str:
         return self.name
+    def addVersion(self, CarModelGenerationVersion: CarModelGenerationVersion):
+        self.listOfVersions.append(CarModelGenerationVersion)
     def deleteWhiteSpace(self, name:str):
         outputList =[]
         for chr in name:
@@ -67,60 +68,99 @@ page_url="https://www.autocentrum.pl/dane-techniczne"
 main_page_url = "https://www.autocentrum.pl"
 
 ListOfCarBrands=[]
+ListOfCarBrands = openAndDecodeJson("ListOfCarBrands.json")
+def reWriteTheObjectFromJson(ListOfCarBrands):
+    newListOfCarBrands=[]
+
+    for i in range(len(ListOfCarBrands)):
+        newListOfCarBrands.append(CarBrand(ListOfCarBrands[i].name, ListOfCarBrands[i].url))
+
+        for j in range(len(ListOfCarBrands[i].listOfModels)):
+            newListOfCarBrands[i].addCarModel(CarModel(ListOfCarBrands[i].listOfModels[j].name, 
+                                                       ListOfCarBrands[i].listOfModels[j].url))
+
+            for k in range(len(ListOfCarBrands[i].listOfModels[j].listOfGenerations)):
+                newListOfCarBrands[i].listOfModels[j].addGeneration(CarModelGeneration(
+                    ListOfCarBrands[i].listOfModels[j].listOfGenerations[k].name, 
+                    ListOfCarBrands[i].listOfModels[j].listOfGenerations[k].url))
 
 
-page = requests.get(page_url)
-soup = BeautifulSoup(page.content, 'html.parser')
+    return newListOfCarBrands
+
+ListOfCarBrands = reWriteTheObjectFromJson(ListOfCarBrands)
 
 
-output = soup.find_all("div", {"class": 'make-wrapper popular-make'})
-output += soup.find_all("div", {"class": 'make-wrapper not-popular-make'})
+# page = requests.get(page_url)
+# soup = BeautifulSoup(page.content, 'html.parser')
 
-#Loading CarBrands into the list
-for i in range(len(output)):
-    name = str(output[i].contents[1].contents[3])
-    name = name[19:]
-    name = name[:-7]
-    url = main_page_url + output[i].contents[1].attrs['href']
 
-    ListOfCarBrands.append(CarBrand(name, url))
+# output = soup.find_all("div", {"class": 'make-wrapper popular-make'})
+# output += soup.find_all("div", {"class": 'make-wrapper not-popular-make'})
 
-print("All of the Car Brands names have been loaded.\n")
+# #Loading CarBrands into the list
+# for i in range(len(output)):
+#     name = str(output[i].contents[1].contents[3])
+#     name = name[19:]
+#     name = name[:-7]
+#     url = main_page_url + output[i].contents[1].attrs['href']
 
-#Loading Models of the Brands into the list
-for brand in ListOfCarBrands[0:1]:
-    page = requests.get(brand.url)
-    soup = BeautifulSoup(page.content, 'html.parser')
-    try:
-        output = soup.find("div", {"class": 'car-selector-box-row'})
-        outputUrls = output.find_all("a", href=True)
-        outputNames = output.find_all("h2", {"class": 'name-of-the-car'})
-    except AttributeError:
-    #If the page doesnt load - skip it
-        continue
+#     ListOfCarBrands.append(CarBrand(name, url))
 
-    for i in range(len(outputNames)):
-        url = main_page_url + outputUrls[i].attrs['href']
-        brand.addCarModel(CarModel(outputNames[i].contents[0].strip(), url))
-    print(f"Finished adding model for: {brand.name}\n")
+# print("All of the Car Brands names have been loaded.\n")
 
-#Loading Generaton of the Models into the list
+# #Loading Models of the Brands into the list
+# for brand in ListOfCarBrands[2:3]:
+#     page = requests.get(brand.url)
+#     soup = BeautifulSoup(page.content, 'html.parser')
+#     try:
+#         output = soup.find("div", {"class": 'car-selector-box-row'})
+#         outputUrls = output.find_all("a", href=True)
+#         outputNames = output.find_all("h2", {"class": 'name-of-the-car'})
+#     except AttributeError:
+#     #If the page doesnt load - skip it
+#         continue
+
+#     for i in range(len(outputNames)):
+#         url = main_page_url + outputUrls[i].attrs['href']
+#         brand.addCarModel(CarModel(outputNames[i].contents[0].strip(), url))
+#     print(f"Finished adding model for: {brand.name}\n")
+
+# #Loading Generaton of the Models into the list
+# for brand in ListOfCarBrands:
+#     for model in brand.listOfModels:
+#         page = requests.get(model.url)
+#         soup = BeautifulSoup(page.content, 'html.parser')
+#         try:
+#         #If Model has no generation - skip looking for them
+#             output = soup.find("div", {"class": 'car-selector-box-row active'})
+#             outputUrls = output.find_all("a", href=True)
+#             outputNames = output.find_all("h2", {"class": 'name-of-the-car'})
+#         except AttributeError:
+#             continue
+
+#         for i in range(len(outputNames)):
+#             url = main_page_url + outputUrls[i].attrs['href']
+#             model.addGeneration(CarModelGeneration(outputNames[i].contents[0].strip(), url))
+#         print(f"Finished adding generations for: {brand.name}: {model.name}\n")
+
+#Loading Versions of the Generations into the list
 for brand in ListOfCarBrands:
     for model in brand.listOfModels:
-        page = requests.get(model.url)
-        soup = BeautifulSoup(page.content, 'html.parser')
-        try:
-        #If Model has no generation - skip looking for them
-            output = soup.find("div", {"class": 'car-selector-box-row active'})
-            outputUrls = output.find_all("a", href=True)
-            outputNames = output.find_all("h2", {"class": 'name-of-the-car'})
-        except AttributeError:
-            continue
+        for generation in model.listOfGenerations:
+            page = requests.get(generation.url)
+            soup = BeautifulSoup(page.content, 'html.parser')
+            try:
+            #If Model has no generation - skip looking for them
+                output = soup.find("div", {"class": 'car-selector-box-row'})
+                outputUrls = output.find_all("a", href=True)
+                outputNames = output.find_all("h2", {"class": 'name-of-the-car'})
+            except AttributeError:
+                continue
 
-        for i in range(len(outputNames)):
-            url = main_page_url + outputUrls[i].attrs['href']
-            model.addGeneration(CarModelGeneration(outputNames[i].contents[0].strip(), url))
-        print(f"Finished adding generations for: {brand.name}: {model.name}\n")
+            for i in range(len(outputNames)):
+                url = main_page_url + outputUrls[i].attrs['href']
+                generation.addVersion(CarModelGenerationVersion(outputNames[i].contents[0].strip(), url))
+            print(f"Finished adding version for: {brand.name}: {model.name}: {generation.name}\n")
 
 elapsed = time.time() - startTime
 print(ListOfCarBrands)
@@ -131,9 +171,12 @@ print(f"\nCzas trwania: {elapsed}")
 json_string = jsonpickle.encode(ListOfCarBrands)
 
 try:
-    f = open("ListOfCarBrands.json", "w")
+    f = open("ListOfCarBrandsNEW.json", "w")
     f.write(json_string)
 finally:
     f.close()
 print("")
+
+
+convertListOfCarBrandsToCSV(ListOfCarBrandsNEW, "ListOfCarBrandsNEW.csv")
 
