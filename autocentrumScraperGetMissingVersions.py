@@ -103,9 +103,11 @@ main_page_url = "https://www.autocentrum.pl"
 #     return newListOfCarBrands
 
 # ListOfCarBrands = reWriteTheObjectFromJson(ListOfCarBrands)
-
 ListOfCarBrands = []
-ListOfCarBrands = openAndDecodeJson("ListOfCarBrands.json")
+shouldLoad = ""
+shouldLoad = input("Czy ładować dane z pliku ListOfCarBrands.json? [Y/N]")
+if shouldLoad.lower() == "y" or shouldLoad.lower() == "t":
+    ListOfCarBrands = openAndDecodeJson("ListOfCarBrands.json")
 
 
 page = requests.get(page_url)
