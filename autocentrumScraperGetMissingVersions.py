@@ -212,11 +212,11 @@ print(f"\nCzas trwania: {elapsed}")
 json_string = jsonpickle.encode(ListOfCarBrands)
 
 try:
-    f = open("ListOfCarBrandsNEW.json", "w")
+    f = open("ListOfCarBrandsWithMissingOnes.json", "w")
     f.write(json_string)
 finally:
     f.close()
 print("")
 
 
-convertListOfCarBrandsToCSV(ListOfCarBrands, "ListOfCarBrandsNEW.csv")
+convertListOfCarBrandsToCSV(ListOfCarBrands, "ListOfCarBrandsWithMissingOnes.csv")
