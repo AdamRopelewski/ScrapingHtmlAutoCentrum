@@ -143,8 +143,7 @@ for brand in ListOfCarBrands:
     for i in range(len(outputNames)):
         url = main_page_url + outputUrls[i].attrs["href"]
         newCarModel = CarModel(outputNames[i].contents[0].strip(), url)
-        if newCarModel not in brand.listOfModels:
-            brand.addCarModel(CarModel(outputNames[i].contents[0].strip(), url))
+        brand.addCarModel(CarModel(outputNames[i].contents[0].strip(), url))
     print(f"Finished adding models for: {brand.name}\n")
 
 # Loading Generaton of the Models into the list
@@ -158,6 +157,10 @@ for brand in ListOfCarBrands:
             outputUrls = output.find_all("a", href=True)
             outputNames = output.find_all("h2", {"class": "name-of-the-car"})
         except AttributeError:
+            # add place holder generation for cars that dont have one
+            if len(model.listOfGenerations) == 0:
+                url = model.url
+                model.addGeneration(CarModelGeneration("PlaceholderGen", url))
             continue
         for i in range(len(outputNames)):
             url = main_page_url + outputUrls[i].attrs["href"]
@@ -165,17 +168,7 @@ for brand in ListOfCarBrands:
                 outputNames[i].contents[0].strip(), url
             )
             model.addGeneration(newCarModelGeneration)
-        # add place holder generation for cars that dont have one
-        try:
-            output = soup.find("div", {"class": "car-selector-box-row"})
-            outputUrls = output.find_all("a", href=True)
-            outputNames = output.find_all("h2", {"class": "name-of-the-car"})
-        except AttributeError:
-            continue
 
-        for _ in range(len(outputNames)):
-            url = model.url
-            model.addGeneration(CarModelGeneration("PlaceholderGen", url))
         print(f"Finished adding generations for: {brand.name}: {model.name}\n")
 
 # Loading Versions of the Generations into the list

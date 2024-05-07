@@ -104,10 +104,11 @@ main_page_url = "https://www.autocentrum.pl"
 
 # ListOfCarBrands = reWriteTheObjectFromJson(ListOfCarBrands)
 ListOfCarBrands = []
-shouldLoad = ""
-shouldLoad = input("Czy ładować dane z pliku ListOfCarBrands.json? [Y/N]")
-if shouldLoad.lower() == "y" or shouldLoad.lower() == "t":
-    ListOfCarBrands = openAndDecodeJson("ListOfCarBrands.json")
+# shouldLoad = ""
+# shouldLoad = input("Czy ładować dane z pliku ListOfCarBrands.json? [Y/N]")
+# if shouldLoad.lower() == "y" or shouldLoad.lower() == "t":
+#     ListOfCarBrands = openAndDecodeJson("ListOfCarBrandsNEW.json")
+ListOfCarBrands = openAndDecodeJson("ListOfCarBrandsNEW.json")
 
 
 page = requests.get(page_url)
@@ -118,14 +119,13 @@ output = soup.find_all("div", {"class": "make-wrapper popular-make"})
 output += soup.find_all("div", {"class": "make-wrapper not-popular-make"})
 
 # Loading CarBrands into the list
-for i in range(len(output)):
-    name = str(output[i].contents[1].contents[3])
-    name = name[19:]
-    name = name[:-7]
-    url = main_page_url + output[i].contents[1].attrs["href"]
-    newCarBrand = CarBrand(name, url)
-    if newCarBrand not in ListOfCarBrands:
-        ListOfCarBrands.append(newCarBrand)
+# for i in range(len(output)):
+#     name = str(output[i].contents[1].contents[3])
+#     name = name[19:]
+#     name = name[:-7]
+#     url = main_page_url + output[i].contents[1].attrs["href"]
+#     newCarBrand = CarBrand(name, url)
+#     ListOfCarBrands.append(newCarBrand)
 
 print("All of the Car Brands names have been loaded.\n")
 
@@ -168,15 +168,15 @@ for brand in ListOfCarBrands:
         #     model.addGeneration(newCarModelGeneration)
         # add place holder generation for cars that dont have one
         try:
-            output = soup.find("div", {"class": "car-selector-box-row"})
+            output = soup.find("div", {"class": "ar-selector-box-row active"})
             outputUrls = output.find_all("a", href=True)
             outputNames = output.find_all("h2", {"class": "name-of-the-car"})
         except AttributeError:
+            if len(model.listOfGenerations) == 0:
+                url = model.url
+                model.addGeneration(CarModelGeneration("PlaceholderGen", url))
             continue
 
-        for _ in range(len(outputNames)):
-            url = model.url
-            model.addGeneration(CarModelGeneration("PlaceholderGen", url))
         print(f"Finished adding generations for: {brand.name}: {model.name}\n")
 
 # Loading Versions of the Generations into the list
