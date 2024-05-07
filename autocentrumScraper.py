@@ -104,7 +104,7 @@ main_page_url = "https://www.autocentrum.pl"
 
 # ListOfCarBrands = reWriteTheObjectFromJson(ListOfCarBrands)
 
-# ListOfCarBrands = []
+ListOfCarBrands = []
 # ListOfCarBrands = openAndDecodeJson("ListOfCarBrands.json")
 
 
@@ -142,8 +142,8 @@ for brand in ListOfCarBrands[2:3]:
     for i in range(len(outputNames)):
         url = main_page_url + outputUrls[i].attrs["href"]
         newCarModel = CarModel(outputNames[i].contents[0].strip(), url)
-        if newCarModel not in brand.listOfModels:
-            brand.addCarModel(CarModel(outputNames[i].contents[0].strip(), url))
+    if newCarModel not in brand.listOfModels:
+        brand.addCarModel(CarModel(outputNames[i].contents[0].strip(), url))
     print(f"Finished adding model for: {brand.name}\n")
 
 # Loading Generaton of the Models into the list
