@@ -151,6 +151,8 @@ print("All of the Car Brands names have been loaded.\n")
 # Loading Generaton of the Models into the list
 for brand in ListOfCarBrands:
     for model in brand.listOfModels:
+        if len(model.listOfGenerations) != 0:
+            continue
         page = requests.get(model.url)
         soup = BeautifulSoup(page.content, "html.parser")
         # try:
