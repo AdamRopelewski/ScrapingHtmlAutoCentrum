@@ -104,8 +104,8 @@ main_page_url = "https://www.autocentrum.pl"
 
 # ListOfCarBrands = reWriteTheObjectFromJson(ListOfCarBrands)
 
-ListOfCarBrands = []
-ListOfCarBrands = openAndDecodeJson("ListOfCarBrands.json")
+# ListOfCarBrands = []
+# ListOfCarBrands = openAndDecodeJson("ListOfCarBrands.json")
 
 
 page = requests.get(page_url)
