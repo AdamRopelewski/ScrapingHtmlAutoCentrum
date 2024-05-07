@@ -175,9 +175,9 @@ for brand in ListOfCarBrands:
             if len(model.listOfGenerations) == 0:
                 url = model.url
                 model.addGeneration(CarModelGeneration("PlaceholderGen", url))
+                print(f"Finished adding generations for: {brand.name}: {model.name}\n")
             continue
 
-        print(f"Finished adding generations for: {brand.name}: {model.name}\n")
 
 # Loading Versions of the Generations into the list
 for brand in ListOfCarBrands:
