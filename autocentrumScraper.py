@@ -83,9 +83,6 @@ startTime = time.time()
 page_url = "https://www.autocentrum.pl/dane-techniczne"
 main_page_url = "https://www.autocentrum.pl"
 
-ListOfCarBrands = []
-ListOfCarBrands = openAndDecodeJson("ListOfCarBrands.json")
-
 
 # def reWriteTheObjectFromJson(ListOfCarBrands):
 #     newListOfCarBrands=[]
@@ -107,6 +104,9 @@ ListOfCarBrands = openAndDecodeJson("ListOfCarBrands.json")
 
 # ListOfCarBrands = reWriteTheObjectFromJson(ListOfCarBrands)
 
+ListOfCarBrands = []
+ListOfCarBrands = openAndDecodeJson("ListOfCarBrands.json")
+
 
 page = requests.get(page_url)
 soup = BeautifulSoup(page.content, "html.parser")
@@ -121,8 +121,9 @@ for i in range(len(output)):
     name = name[19:]
     name = name[:-7]
     url = main_page_url + output[i].contents[1].attrs["href"]
-
-    ListOfCarBrands.append(CarBrand(name, url))
+    newCarBrand = CarBrand(name, url)
+    if newCarBrand not in ListOfCarBrands:
+        ListOfCarBrands.append(newCarBrand)
 
 print("All of the Car Brands names have been loaded.\n")
 
@@ -140,7 +141,9 @@ for brand in ListOfCarBrands[2:3]:
 
     for i in range(len(outputNames)):
         url = main_page_url + outputUrls[i].attrs["href"]
-        brand.addCarModel(CarModel(outputNames[i].contents[0].strip(), url))
+        newCarModel = CarModel(outputNames[i].contents[0].strip(), url)
+        if newCarModel not in brand.listOfModels:
+            brand.addCarModel(CarModel(outputNames[i].contents[0].strip(), url))
     print(f"Finished adding model for: {brand.name}\n")
 
 # Loading Generaton of the Models into the list
@@ -157,9 +160,10 @@ for brand in ListOfCarBrands:
             continue
         for i in range(len(outputNames)):
             url = main_page_url + outputUrls[i].attrs["href"]
-            model.addGeneration(
-                CarModelGeneration(outputNames[i].contents[0].strip(), url)
+            newCarModelGeneration = CarModelGeneration(
+                outputNames[i].contents[0].strip(), url
             )
+            model.addGeneration(newCarModelGeneration)
         # add place holder generation for cars that dont have one
         try:
             output = soup.find("div", {"class": "car-selector-box-row"})
