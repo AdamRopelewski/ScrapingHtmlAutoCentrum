@@ -85,16 +85,16 @@ def openAndDecodeJson(path: str) -> list:
 
 
 def convertListOfCarBrandsToCSV(ListOfCarBrands: list, path: str) -> None:
-    output = []
+    output = ["Brand;Model;Generation;Version"]
     for brand in ListOfCarBrands:
-        for model in brand.listOfModels:
+        for model in brand["listOfModels"]:
             if len(model.listOfGenerations) == 0:
                 output.append(f"{brand.name}; {model.name}\n")
             else:
                 for generation in model.listOfGenerations:
                     for version in generation.listOfVersions:
                         output.append(
-                            f"{brand.name}; {model.name}; {generation.name}; {version.name}\n"
+                            f"{brand.name};{model.name};{generation.name};{version.name}\n"
                         )
 
     try:
